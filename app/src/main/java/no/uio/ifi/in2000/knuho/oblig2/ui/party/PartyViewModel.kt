@@ -1,48 +1,48 @@
 package no.uio.ifi.in2000.knuho.oblig2.ui.party
 
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import no.uio.ifi.in2000.knuho.oblig2.data.alpacas.AlpacaPartiesRepository
 import no.uio.ifi.in2000.knuho.oblig2.model.alpacas.PartyInfo
-import androidx.media3.common.util.Log
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 //////////////////////////////
 // PartyViewModel.kt        //
 //////////////////////////////
 
-data class PartyUIState(
+data class SinglePartyUiState(
     val chosenParty: List<PartyInfo> = listOf()
 )
 
 
-class PartyViewModel() : ViewModel() {
-    private val repository: AlpacaPartiesRepository = AlpacaPartiesRepository()
+class PartyViewModel(
+    private val partyId: String
+) : ViewModel() {
+    private val alpacaRepository: AlpacaPartiesRepository = AlpacaPartiesRepository()
 
-    val partyUIState : StateFlow<PartyUIState> =
-        repository.observeChosenPartyInfo()
-            .map {
-                PartyUIState(
-                    chosenParty = it
-                )
-            }
-            .stateIn(
-                viewModelScope,
-                started = SharingStarted.WhileSubscribed(5_000),
-                initialValue = PartyUIState()
-            )
+    private val _singlePartyUiState = MutableStateFlow(SinglePartyUiState())
 
-    // Tilby mulighet til å velge parti
-    fun choosePartyInfo(id: String) {
+    val singlePartyUiState: StateFlow<SinglePartyUiState> = _singlePartyUiState.asStateFlow()
+
+    init {
+        loadSinglePartyInfo(partyId)
+    }
+
+    private fun loadSinglePartyInfo(id: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.choosePartyInfo(id)
+            _singlePartyUiState.update { currentPartyUiState ->
+                val singleParty = alpacaRepository.getSingleParty(id)
+
+                currentPartyUiState.copy(chosenParty = singleParty)
+            }
         }
     }
+
+
 }

@@ -1,17 +1,13 @@
 package no.uio.ifi.in2000.knuho.oblig2.ui.party
 
-import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -37,14 +33,9 @@ import no.uio.ifi.in2000.knuho.oblig2.Screen
 @Composable
 fun PartyScreen(
     navController: NavController,
-    partyId: String,
-    partyViewModel: PartyViewModel = PartyViewModel()
+    partyViewModel: PartyViewModel
 ) {
-    val partyUIState by partyViewModel.partyUIState.collectAsState()
-    partyViewModel.choosePartyInfo(partyId)
-    Log.d("Objectet til partiet som ble valgt", "${partyUIState.chosenParty}")
-
-
+    val partyInfoUiState: SinglePartyUiState by partyViewModel.singlePartyUiState.collectAsState()
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 
@@ -77,7 +68,7 @@ fun PartyScreen(
         },
     ) { innerPadding ->
         LazyColumn {
-            items(partyUIState.chosenParty) {chosenParty ->
+            items(partyInfoUiState.chosenParty) {chosenParty ->
                 Box(modifier = Modifier.fillMaxHeight()){
                     Column(
                         modifier = Modifier

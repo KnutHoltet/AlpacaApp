@@ -1,12 +1,13 @@
 package no.uio.ifi.in2000.knuho.oblig2.ui.home
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.knuho.oblig2.data.alpacas.AlpacaPartiesRepository
 import no.uio.ifi.in2000.knuho.oblig2.model.alpacas.PartyInfo
@@ -20,43 +21,26 @@ data class AlpacaUIState(
 )
 
 class HomeScreenViewModel : ViewModel() {
-    // Oppretter et repository
-    private val repository: AlpacaPartiesRepository = AlpacaPartiesRepository()
+    private val alpacaRepository: AlpacaPartiesRepository = AlpacaPartiesRepository()
 
-    // Brukergrensesnitt
-    val alpacaUIState : StateFlow<AlpacaUIState> =
-        combine(
-            repository.observeAlpacaParties(),
-            repository.observeFetchStatus()
+    private val _partiesUIstate = MutableStateFlow(AlpacaUIState())
 
-        ) { alpacaParties, wifiBool ->
-            AlpacaUIState(
-                alpacaParties = alpacaParties,
-                wifiBoolean = wifiBool
-            )
-        }
-        .stateIn(
-            viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000), // 5_000 = 5 sec
-            initialValue = AlpacaUIState()
-        )
+    val  partiesUiState: StateFlow<AlpacaUIState> = _partiesUIstate.asStateFlow()
 
-
-    // https://developer.android.com/topic/architecture/ui-layer/state-production#initializing-state-production
-    private var initializeCalled = false
-    fun initialize() {
-        if(initializeCalled) return
-        initializeCalled = true
-        viewModelScope.launch {
-            repository.fetchAlpacaParties()
-        }
-    }
-
-    /*
     init {
-        viewModelScope.launch {
-            repository.fetchAlpacaParties()
+        Log.d("HomeScreenViewModel", "Calling loadParties")
+        loadParties()
+    }
+
+    private fun loadParties() {
+        viewModelScope.launch(Dispatchers.IO) {
+            _partiesUIstate.update { currentPartiesUiState ->
+                Log.d("HomeScreenViewModel", "Calling alpacaRepository.getAlpacaParties()")
+
+                val parties = alpacaRepository.getAlpacaParties()
+
+                currentPartiesUiState.copy(alpacaParties = parties)
+            }
         }
     }
-     */
 }

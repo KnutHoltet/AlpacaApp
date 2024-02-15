@@ -15,7 +15,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import no.uio.ifi.in2000.knuho.oblig2.ui.home.HomeScreen
-import no.uio.ifi.in2000.knuho.oblig2.ui.home.HomeScreenViewModel
 import no.uio.ifi.in2000.knuho.oblig2.ui.party.PartyScreen
 import no.uio.ifi.in2000.knuho.oblig2.ui.party.PartyViewModel
 import no.uio.ifi.in2000.knuho.oblig2.ui.theme.Knuho_oblig2Theme
@@ -51,7 +50,7 @@ class MainActivity : ComponentActivity() {
 
                             val id = backStackEntry.arguments?.getString("partyId").toString()
 
-                            PartyScreen(navController, id)
+                            PartyScreen(navController, PartyViewModel(id))
 
                         }
                     }
