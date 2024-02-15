@@ -42,10 +42,10 @@ class MainActivity : ComponentActivity() {
                         navController = navController,
                         startDestination = Screen.Home.route
                     ) {
-                        composable(Screen.Home.route) { backStackEntry ->
-
+                        composable(Screen.Home.route) {
                             HomeScreen(navController)
                         }
+
                         composable("${Screen.Party.route}/{partyId}") { backStackEntry ->
 
                             val id = backStackEntry.arguments?.getString("partyId").toString()
