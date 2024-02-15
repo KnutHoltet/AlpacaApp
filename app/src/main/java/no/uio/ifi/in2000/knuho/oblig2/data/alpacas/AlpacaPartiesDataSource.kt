@@ -28,13 +28,6 @@ class AlpacaPartiesDataSource {
     }
 
     suspend fun fetchAlpacaParties(): List<PartyInfo> {
-
-        // Log.d("ALPACA_DATA_SOURCE", "alpacaDataSource.fetchAlpacaParties() HTTP status: ${response.status}")
-        // Log.d(
-        //     "ALPACA_DATA_SOURCE",
-        //     "alpacaDataSource.fetchAlpacaParties() returned a Parties object containing ${parties.parties.size} individual parties"
-        // )
-
         val parties: Parties = try {
             client.get(url).body()
 

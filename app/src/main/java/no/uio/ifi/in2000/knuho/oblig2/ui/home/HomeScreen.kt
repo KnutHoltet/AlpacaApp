@@ -4,14 +4,28 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -20,31 +34,139 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import androidx.compose.material3.Text
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.navigation.NavController
+import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.knuho.oblig2.Screen
 import no.uio.ifi.in2000.knuho.oblig2.model.alpacas.PartyInfo
 
+
+// https://developer.android.com/jetpack/compose/components/snackbar
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     navController: NavController,
     homeScreenViewModel: HomeScreenViewModel = HomeScreenViewModel()
 ) {
 
-    val alpacaUiState: AlpacaUIState by homeScreenViewModel.partiesUiState.collectAsState()
+    val alpacaUiState: AlpacaUiState by homeScreenViewModel.partiesUiState.collectAsState()
+    val votesUiStateOne: VotesUiState by homeScreenViewModel.districtOneUiState.collectAsState()
+    val votesUiStateTwo: VotesUiState by homeScreenViewModel.districtTwoUiState.collectAsState()
+    val votesUiStateThree: VotesUiState by homeScreenViewModel.districtThreeUiState.collectAsState()
 
-    LazyColumn(modifier = Modifier.fillMaxSize()){
-        items(alpacaUiState.alpacaParties) { partyInfo ->
-            AlpacaPartyCard(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(8.dp),
-                alpacaParty = partyInfo,
-                navCon = navController
-            )
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+
+    var isExpanded by remember { mutableStateOf(false) }
+    val district: List<String> = listOf("District 1", "District 2", "District 3", "District 4")
+    var selectedDistrict by remember { mutableStateOf("") }
+
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        },
+
+
+        floatingActionButton = {
+            if(alpacaUiState.alpacaParties.isEmpty()) {
+                ExtendedFloatingActionButton(
+                    text = { Text("no internett - refresh") },
+                    icon = { Icon(Icons.Filled.Home, contentDescription = "") },
+                    onClick = {
+                        scope.launch {
+                            val result = snackbarHostState
+                                .showSnackbar(
+                                    message = "No internett connection",
+                                    actionLabel = "Refresh",
+                                    // Defaults to SnackbarDuration.Short
+                                    duration = SnackbarDuration.Indefinite,
+                                )
+                            when (result) {
+                                SnackbarResult.ActionPerformed -> {
+                                    /* Handle snackbar action performed */
+                                    navController.navigate(Screen.Home.route)
+                                }
+                                SnackbarResult.Dismissed -> {
+                                    /* Handle snackbar dismissed */
+                                }
+                            }
+                        }
+                    }
+                )
+            } else{
+                snackbarHostState.currentSnackbarData?.dismiss()
+            }
         }
+
+    ) { contentPadding ->
+        // Screen content
+        LazyColumn(modifier = Modifier.fillMaxSize()){
+            items(alpacaUiState.alpacaParties) { partyInfo ->
+                AlpacaPartyCard(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(contentPadding),
+                    alpacaParty = partyInfo,
+                    navCon = navController
+                )
+
+
+            }
+        }
+
+        Column {
+            ExposedDropdownMenuBox(
+                expanded = isExpanded,
+                onExpandedChange = { isExpanded = it && alpacaUiState.alpacaParties.isNotEmpty() },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                OutlinedTextField(
+                    value = selectedDistrict,
+                    onValueChange = {},
+                    placeholder = {Text(text = "Velg district")},
+                    readOnly = true,
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded) },
+                    colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                    modifier = Modifier
+                        .menuAnchor()
+                        .fillMaxWidth()
+                        .padding(top = 16.dp)
+                )
+                ExposedDropdownMenu(
+                    expanded = isExpanded,
+                    onDismissRequest = { isExpanded = false },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    district.filter { it != selectedDistrict }.forEach {valgtDistrict ->
+                        DropdownMenuItem(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = { Text(text = valgtDistrict, modifier = Modifier.fillMaxWidth()) },
+                            onClick = {
+                                selectedDistrict = valgtDistrict
+                                isExpanded = false
+                                when(district.indexOf(selectedDistrict)) {
+
+                                    0 -> votesUiStateOne.districtOneVotes
+                                    1 -> votesUiStateTwo.districtTwoVotes
+                                    2 -> votesUiStateThree.districtThreeVotes
+
+                                }
+                            }
+                        )
+                    }
+                }
+            }
+
+        }
+
+
+
     }
 }
 
