@@ -4,18 +4,20 @@ package no.uio.ifi.in2000.knuho.oblig2.data.alpacas
 // Imports                  //
 //////////////////////////////
 import android.util.Log
-import kotlinx.coroutines.Dispatchers
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.knuho.oblig2.model.alpacas.PartyInfo
 
 //////////////////////////////
 // AlpacaPartiesRepository  //
 //////////////////////////////
-class AlpacaPartiesRepository {
+class AlpacaPartiesRepository : ViewModel() {
+    private val dataSource = AlpacaPartiesDataSource()
 
     // Intern flow som er alpaca partier
     private val alpacaParties = MutableStateFlow<List<PartyInfo>>(listOf())
@@ -30,12 +32,17 @@ class AlpacaPartiesRepository {
     fun observeChosenPartyInfo() : StateFlow<List<PartyInfo>> = chosenPartyInfo.asStateFlow()
 
     // Parties = val parties: List<PartyInfo>
-    suspend fun refreshAlpacaParties(): Boolean {
-        val dataSource = AlpacaPartiesDataSource()
+    suspend fun fetchAlpacaParties() {
 
         // Henter List<PartyInfo> fra AlpacaPartiesDataSource - som kan vaere null -
         // Returnerer true hvis det er data, false hvis det ikke er data -
         // Returnerer List<PartyInfo> hvis det er data
+        val fetchedAlpacaPartyInfoFromSource = dataSource.fetchAlpacaParties()
+        alpacaParties.update {
+            fetchedAlpacaPartyInfoFromSource
+        }
+
+        /*
         return withContext(Dispatchers.IO) {
             dataSource.fetchAlpacaParties()?.let {
                 alpacaParties.value = it.parties
@@ -45,15 +52,37 @@ class AlpacaPartiesRepository {
                 false
             }
         }
+
+         */
     }
 
     // AlpacaParties har bare et parti i lista med en funksjon
     suspend fun choosePartyInfo(id: String) {
         Log.d("Valgt Parti", "Valgt parti med id: $id")
-        return withContext(Dispatchers.IO) {
-            alpacaParties.value.find { it.id == id }?.let {
-                chosenPartyInfo.value = listOf(it)
-            }
+
+        viewModelScope.launch {
+            chosenPartyInfo.update { it -> it.filter { it.id == id } }
         }
+
+
+        /*
+        withContext(Dispatchers.IO) {
+            chosenPartyInfo.update { it -> it.filter { it.id == id } }
+        }
+         */
     }
 }
+
+////////////////////////////
+// Test funksjon          //
+////////////////////////////
+suspend fun main(){
+    val alpaca = AlpacaPartiesRepository()
+    // println(alpaca.refreshAlpacaParties())
+    // println(alpaca.observeAlpacaParties())
+    // println(alpaca.observeFetchStatus())
+    // println(alpaca.observeChosenPartyInfo())
+    // println(alpaca.choosePartyInfo("1"))
+    println(alpaca.fetchAlpacaParties().toString())
+}
+

@@ -1,5 +1,6 @@
 package no.uio.ifi.in2000.knuho.oblig2.model.alpacas
 
+
 data class Parties(
     val parties: List<PartyInfo>
 )

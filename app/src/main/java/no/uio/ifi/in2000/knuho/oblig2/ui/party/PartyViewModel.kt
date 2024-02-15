@@ -23,8 +23,7 @@ data class PartyUIState(
 )
 
 
-
-class PartyViewModel(id: String?) : ViewModel() {
+class PartyViewModel() : ViewModel() {
     private val repository: AlpacaPartiesRepository = AlpacaPartiesRepository()
 
     val partyUIState : StateFlow<PartyUIState> =

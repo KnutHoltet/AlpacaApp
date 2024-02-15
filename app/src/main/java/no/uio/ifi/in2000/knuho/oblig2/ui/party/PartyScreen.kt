@@ -1,11 +1,14 @@
 package no.uio.ifi.in2000.knuho.oblig2.ui.party
 
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
@@ -25,6 +28,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import no.uio.ifi.in2000.knuho.oblig2.Screen
 
 
@@ -33,9 +37,15 @@ import no.uio.ifi.in2000.knuho.oblig2.Screen
 @Composable
 fun PartyScreen(
     navController: NavController,
-    partyViewModel: PartyViewModel
+    partyId: String,
+    partyViewModel: PartyViewModel = PartyViewModel()
 ) {
     val partyUIState by partyViewModel.partyUIState.collectAsState()
+    partyViewModel.choosePartyInfo(partyId)
+    Log.d("Objectet til partiet som ble valgt", "${partyUIState.chosenParty}")
+
+
+
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 
     Scaffold(
@@ -49,7 +59,7 @@ fun PartyScreen(
                 ),
                 title = {
                     Text(
-                        "Centered Top App Bar",
+                        "Party list",
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -62,26 +72,24 @@ fun PartyScreen(
                         )
                     }
                 },
-                actions = {
-                    IconButton(onClick = { /* do something */ }) {
-                        Icon(
-                            imageVector = Icons.Filled.Menu,
-                            contentDescription = "Localized description"
-                        )
-                    }
-                },
                 scrollBehavior = scrollBehavior,
             )
         },
     ) { innerPadding ->
-        ScrollContent(innerPadding)
-    }
-}
-
-@Composable
-fun ScrollContent(innerPadding: PaddingValues) {
-    Column {
-        Text(text = "hei")
+        LazyColumn {
+            items(partyUIState.chosenParty) {chosenParty ->
+                Box(modifier = Modifier.fillMaxHeight()){
+                    Column(
+                        modifier = Modifier
+                            .padding(innerPadding)
+                            .padding(8.dp)
+                    ){
+                        Text(text = chosenParty.name)
+                        Text(text = chosenParty.description)
+                    }
+                }
+            }
+        }
     }
 }
 

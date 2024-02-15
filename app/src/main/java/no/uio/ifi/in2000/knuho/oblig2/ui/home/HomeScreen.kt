@@ -30,8 +30,16 @@ import no.uio.ifi.in2000.knuho.oblig2.model.alpacas.PartyInfo
 @Composable
 fun HomeScreen(
     navController: NavController,
-    homeScreenViewModel: HomeScreenViewModel
+    homeScreenViewModel: HomeScreenViewModel = HomeScreenViewModel()
 ) {
+    ///////////////////////////////
+    // Initialiserer viewmodelen //
+    ///////////////////////////////
+    homeScreenViewModel.initialize()
+
+
+
+
     val alpacaUIState by homeScreenViewModel.alpacaUIState.collectAsState()
 
     LazyColumn(modifier = Modifier.fillMaxSize()){
