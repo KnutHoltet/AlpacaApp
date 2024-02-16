@@ -34,5 +34,6 @@ class AggregatedVotesDataSource {
         return votes.partiesVotes.map {
             DistrictVotes(District.THREE, it.partyId, it.votes)
         }
+
     }
 }

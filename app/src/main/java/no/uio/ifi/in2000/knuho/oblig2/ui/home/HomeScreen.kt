@@ -45,6 +45,7 @@ import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.knuho.oblig2.Screen
 import no.uio.ifi.in2000.knuho.oblig2.model.alpacas.PartyInfo
+import no.uio.ifi.in2000.knuho.oblig2.model.votes.District
 
 
 // https://developer.android.com/jetpack/compose/components/snackbar
@@ -152,9 +153,9 @@ fun HomeScreen(
                                 isExpanded = false
                                 when(district.indexOf(selectedDistrict)) {
 
-                                    0 -> votesUiStateOne.districtOneVotes
-                                    1 -> votesUiStateTwo.districtTwoVotes
-                                    2 -> votesUiStateThree.districtThreeVotes
+                                    0 -> homeScreenViewModel.getPartyVotes(District.ONE)
+                                    1 -> homeScreenViewModel.getPartyVotes(District.TWO)
+                                    2 -> homeScreenViewModel.getPartyVotes(District.THREE)
 
                                 }
                             }
@@ -164,9 +165,6 @@ fun HomeScreen(
             }
 
         }
-
-
-
     }
 }
 

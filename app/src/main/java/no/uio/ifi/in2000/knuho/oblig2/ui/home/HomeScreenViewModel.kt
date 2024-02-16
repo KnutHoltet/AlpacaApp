@@ -92,4 +92,11 @@ class HomeScreenViewModel : ViewModel() {
 
         }
     }
+
+
+    fun getPartyVotes(district: District) {
+        viewModelScope.launch {
+            votesRepository.getDistrictVotes(district)
+        }
+    }
 }
