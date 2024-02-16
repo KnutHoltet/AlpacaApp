@@ -54,3 +54,13 @@ class IndividualVotesDataSource {
         }
     }
 }
+
+
+
+//////////////////////
+// Test funksjon    //
+//////////////////////
+suspend fun main() {
+    // val dataSource = IndividualVotesDataSource()
+    // println(dataSource.toString())
+}

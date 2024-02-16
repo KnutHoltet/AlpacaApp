@@ -66,7 +66,7 @@ fun HomeScreen(
     val scope = rememberCoroutineScope()
 
     var isExpanded by remember { mutableStateOf(false) }
-    val district: List<String> = listOf("District 1", "District 2", "District 3", "District 4")
+    val district: List<String> = listOf("District 1", "District 2", "District 3")
     var selectedDistrict by remember { mutableStateOf("") }
 
     Scaffold(
@@ -207,6 +207,7 @@ fun AlpacaPartyCard(modifier: Modifier = Modifier, alpacaParty : PartyInfo, navC
                 Legg inn mer beskrivende tekst
                  */
                 Text("Parti navn: ${alpacaParty.name}")
+                Text("Parti leder: ${alpacaParty.leader}")
             }
 
         }
