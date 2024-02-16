@@ -1,5 +1,6 @@
 package no.uio.ifi.in2000.knuho.oblig2.ui.home
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -107,21 +108,8 @@ fun HomeScreen(
 
     ) { contentPadding ->
         // Screen content
-        LazyColumn(modifier = Modifier.fillMaxSize()){
-            items(alpacaUiState.alpacaParties) { partyInfo ->
-                AlpacaPartyCard(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(contentPadding),
-                    alpacaParty = partyInfo,
-                    navCon = navController
-                )
 
-
-            }
-        }
-
-        Column {
+        Column (modifier = Modifier.padding(contentPadding)){
             ExposedDropdownMenuBox(
                 expanded = isExpanded,
                 onExpandedChange = { isExpanded = it && alpacaUiState.alpacaParties.isNotEmpty() },
@@ -151,6 +139,7 @@ fun HomeScreen(
                             onClick = {
                                 selectedDistrict = valgtDistrict
                                 isExpanded = false
+                                /*
                                 when(district.indexOf(selectedDistrict)) {
 
                                     0 -> homeScreenViewModel.getPartyVotes(District.ONE)
@@ -158,12 +147,28 @@ fun HomeScreen(
                                     2 -> homeScreenViewModel.getPartyVotes(District.THREE)
 
                                 }
+
+                                 */
                             }
                         )
                     }
                 }
             }
+            VoteList(homeScreenViewModel, selectedDistrict)
 
+            LazyColumn(modifier = Modifier.fillMaxSize()){
+                items(alpacaUiState.alpacaParties) { partyInfo ->
+                    AlpacaPartyCard(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(contentPadding),
+                        alpacaParty = partyInfo,
+                        navCon = navController
+                    )
+
+
+                }
+            }
         }
     }
 }

@@ -42,6 +42,11 @@ class HomeScreenViewModel : ViewModel() {
 
     private val votesRepository: VotesRepository = VotesRepository()
 
+    private val _votesUIState = MutableStateFlow(VotesUiState())
+
+    val votesUIState: StateFlow<VotesUiState> = _votesUIState.asStateFlow()
+
+
     private val _districtOneUiState = MutableStateFlow(VotesUiState())
     private val _districtTwoUiState = MutableStateFlow(VotesUiState())
     private val _districtThreeUiState = MutableStateFlow(VotesUiState())

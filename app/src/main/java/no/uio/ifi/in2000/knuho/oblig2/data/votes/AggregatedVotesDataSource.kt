@@ -31,9 +31,9 @@ class AggregatedVotesDataSource {
             PartiesVotes(listOf())
         }
 
-        return votes.partiesVotes.map {
+        return votes.partiesVotes?.map {
             DistrictVotes(District.THREE, it.partyId, it.votes)
-        }
+        } ?: listOf()
 
     }
 }
