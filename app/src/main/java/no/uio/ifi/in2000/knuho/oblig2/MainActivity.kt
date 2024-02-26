@@ -41,6 +41,7 @@ class MainActivity : ComponentActivity() {
                     NavHost(
                         navController = navController,
                         startDestination = Screen.Home.route
+                        // startDestination = Screen.Party.route
                     ) {
                         composable(Screen.Home.route) {
                             HomeScreen(navController)
@@ -50,7 +51,8 @@ class MainActivity : ComponentActivity() {
 
                             val id = backStackEntry.arguments?.getString("partyId").toString()
 
-                            PartyScreen(navController, PartyViewModel(id))
+
+                            PartyScreen(navController, id)
 
                         }
                     }

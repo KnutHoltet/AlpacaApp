@@ -1,5 +1,7 @@
 package no.uio.ifi.in2000.knuho.oblig2.ui.party
 
+import android.util.Log
+import androidx.annotation.MainThread
 import kotlinx.coroutines.flow.StateFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,6 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.io.IOException
 
 //////////////////////////////
 // PartyViewModel.kt        //
@@ -22,7 +25,6 @@ data class SinglePartyUiState(
 
 
 class PartyViewModel(
-    private val partyId: String
 ) : ViewModel() {
     private val alpacaRepository: AlpacaPartiesRepository = AlpacaPartiesRepository()
 
@@ -30,19 +32,29 @@ class PartyViewModel(
 
     val singlePartyUiState: StateFlow<SinglePartyUiState> = _singlePartyUiState.asStateFlow()
 
-    init {
-        loadSinglePartyInfo(partyId)
-    }
 
-    private fun loadSinglePartyInfo(id: String) {
+    private var initializedCalled = false
+
+    @MainThread
+    fun loadSinglePartyInfo(id: String) {
+
+        Log.d("initializedCalled verdi før", "$initializedCalled")
+
+        if(initializedCalled) return
+        initializedCalled = true
+
+
         viewModelScope.launch(Dispatchers.IO) {
             _singlePartyUiState.update { currentPartyUiState ->
-                val singleParty = alpacaRepository.getSingleParty(id)
 
+                val singleParty = alpacaRepository.getSingleParty(id)
+                Log.d("API-kall", "API-kall i PartyViewModeAPI-kall i PartyViewModell")
+                Log.d("initializedCalled verdi", "$initializedCalled")
                 currentPartyUiState.copy(chosenParty = singleParty)
+
+
             }
         }
+
     }
-
-
 }

@@ -1,6 +1,7 @@
 package no.uio.ifi.in2000.knuho.oblig2.ui.home
 
 import android.util.Log
+import androidx.annotation.MainThread
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
@@ -56,13 +57,20 @@ class HomeScreenViewModel : ViewModel() {
     val districtThreeUiState: StateFlow<VotesUiState> = _districtThreeUiState.asStateFlow()
 
 
-    init {
-        Log.d("HomeScreenViewModel", "Calling loadParties")
-        loadParties()
-        loadVotes()
-    }
+    // init {
+    //     Log.d("HomeScreenViewModel", "Calling loadParties")
+    //     loadParties()
+    //     loadVotes()
+    // }
 
-    private fun loadParties() {
+    private var initializedCalled = false
+    @MainThread
+    fun loadParties() {
+
+        if (initializedCalled) return
+        initializedCalled = true
+
+
         viewModelScope.launch(Dispatchers.IO) {
             _partiesUIstate.update { currentPartiesUiState ->
                 Log.d("HomeScreenViewModel", "Calling alpacaRepository.getAlpacaParties()")
@@ -75,7 +83,7 @@ class HomeScreenViewModel : ViewModel() {
     }
 
 
-    private fun loadVotes() {
+    fun loadVotes() {
         viewModelScope.launch(Dispatchers.IO)  {
 
             _districtOneUiState.update {getVotesUiState ->

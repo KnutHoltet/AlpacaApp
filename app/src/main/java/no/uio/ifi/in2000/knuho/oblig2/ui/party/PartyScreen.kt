@@ -1,5 +1,6 @@
 package no.uio.ifi.in2000.knuho.oblig2.ui.party
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -31,6 +32,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import androidx.compose.ui.graphics.Color
+import androidx.lifecycle.viewmodel.compose.viewModel
 import no.uio.ifi.in2000.knuho.oblig2.Screen
 import org.jetbrains.annotations.Async
 
@@ -40,11 +42,14 @@ import org.jetbrains.annotations.Async
 @Composable
 fun PartyScreen(
     navController: NavController,
-    partyViewModel: PartyViewModel
+    partyId : String,
+    partyViewModel: PartyViewModel = PartyViewModel(),
 ) {
     val partyInfoUiState: SinglePartyUiState by partyViewModel.singlePartyUiState.collectAsState()
+    partyViewModel.loadSinglePartyInfo(partyId)
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -76,6 +81,7 @@ fun PartyScreen(
     ) { innerPadding ->
         LazyColumn {
             items(partyInfoUiState.chosenParty) {chosenParty ->
+                // Log.d("ASLØDFJASLØDKFJALØSKDJFALØKSJDF", "$chosenParty")
                 Box(
                     modifier = Modifier
                         .fillMaxHeight()

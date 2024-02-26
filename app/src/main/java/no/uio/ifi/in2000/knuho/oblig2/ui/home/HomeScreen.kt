@@ -58,6 +58,9 @@ fun HomeScreen(
 ) {
 
     val alpacaUiState: AlpacaUiState by homeScreenViewModel.partiesUiState.collectAsState()
+    homeScreenViewModel.loadParties()
+    homeScreenViewModel.loadVotes()
+
     val votesUiStateOne: VotesUiState by homeScreenViewModel.districtOneUiState.collectAsState()
     val votesUiStateTwo: VotesUiState by homeScreenViewModel.districtTwoUiState.collectAsState()
     val votesUiStateThree: VotesUiState by homeScreenViewModel.districtThreeUiState.collectAsState()
