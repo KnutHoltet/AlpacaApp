@@ -62,8 +62,8 @@ class HomeScreenViewModel : ViewModel() {
     //     loadParties()
     //     loadVotes()
     // }
-
     private var initializedCalled = false
+
     @MainThread
     fun loadParties() {
 
