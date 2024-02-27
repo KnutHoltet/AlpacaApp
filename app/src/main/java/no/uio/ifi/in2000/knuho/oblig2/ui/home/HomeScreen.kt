@@ -164,6 +164,9 @@ fun HomeScreen(
                     AlpacaPartyCard(
                         modifier = Modifier
                             .fillMaxSize()
+                            .clickable {
+                                navController.navigate("${Screen.Party.route}/${partyInfo.id}")
+                            }
                             .padding(contentPadding),
                         alpacaParty = partyInfo,
                         navCon = navController
@@ -179,10 +182,10 @@ fun HomeScreen(
 @Composable
 fun AlpacaPartyCard(modifier: Modifier = Modifier, alpacaParty : PartyInfo, navCon: NavController){
     OutlinedCard(
-        modifier = modifier
-            .clickable {
-                navCon.navigate("${Screen.Party.route}/${alpacaParty.id}")
-            },
+        modifier = modifier,
+            // .clickable {
+            //     navCon.navigate("${Screen.Party.route}/${alpacaParty.id}")
+            // },
         colors = CardDefaults.cardColors(
             Color(
                 android.graphics.Color.parseColor(
